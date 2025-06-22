@@ -1,36 +1,3 @@
-// {
-//     "name": "accounts/fireworks/models/qwen3-30b-a3b",
-//     "title": "Qwen3 30B-A3B",
-//     "description": "Latest Qwen3 state of the art model, 30B with 3B active parameter model",
-//     "provider": {
-//       "name": "Qwen",
-//       "hf": "Qwen",
-//       "org": {
-//         "name": "Qwen",
-//         "logos": {
-//           "logomark": {
-//             "src": "/images/logos/qwen-icon.svg"
-//           }
-//         }
-//       }
-//     },
-//     "type": "text",
-//     "serverless": true,
-//     "contextLength": 40000,
-//     "supportsImageInput": false,
-//     "tags": [
-//       "Serverless",
-//       "LLM",
-//       "Chat",
-//       "Function Calling",
-//       "On-demand"
-//     ],
-//     "cost": {
-//       "inputTokenPrice": 0.15,
-//       "outputTokenPrice": 0.6,
-//       "tokenPrice": 0.15
-//     }
-//   },
 export interface FireworksModel {
     name: string;
     title: string;
@@ -93,8 +60,8 @@ export interface FireworksChatResponse {
     };
 }
 
-export interface IFireworksAI {
+export interface FireworksAI {
     getModels(): Promise<FireworksModel[]>;
-    createChatCompletion(request: FireworksChatRequest): Promise<FireworksChatResponse>;
-    createChatCompletionStream(request: FireworksChatRequest): Promise<ReadableStream>;
+    createCompletion(request: FireworksChatRequest): Promise<FireworksChatResponse>;
+    createCompletionStream(request: FireworksChatRequest): Promise<ReadableStream>;
 }

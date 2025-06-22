@@ -47,7 +47,7 @@ describe('ChatService', () => {
 
       const mockCreateStream = vi.fn().mockResolvedValue(mockStream)
       vi.mocked(MockFireworksSDK).mockImplementation(() => ({
-        createChatCompletionStream: mockCreateStream
+        createCompletionStream: mockCreateStream
       } as any))
 
       const result = await chatService.createChatStream('accounts/fireworks/models/qwen3-30b-a3b', [
@@ -86,7 +86,7 @@ describe('ChatService', () => {
 
       const mockCreateStream = vi.fn().mockResolvedValue(mockStream)
       vi.mocked(FireworksSDK).mockImplementation(() => ({
-        createChatCompletionStream: mockCreateStream
+        createCompletionStream: mockCreateStream
       } as any))
 
       const result = await chatService.createChatStream('accounts/fireworks/models/llama-v3-8b-instruct', [
@@ -128,7 +128,7 @@ describe('ChatService', () => {
       const mockError = new Error('Streaming Error')
       const mockCreateStream = vi.fn().mockRejectedValue(mockError)
       vi.mocked(MockFireworksSDK).mockImplementation(() => ({
-        createChatCompletionStream: mockCreateStream
+        createCompletionStream: mockCreateStream
       } as any))
 
       await expect(chatService.createChatStream('accounts/fireworks/models/qwen3-30b-a3b', [

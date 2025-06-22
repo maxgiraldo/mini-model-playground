@@ -39,7 +39,7 @@ describe('MockFireworksSDK', () => {
     })
   })
 
-  describe('createChatCompletion', () => {
+  describe('createCompletion', () => {
     it('should return mock chat completion with delay', async () => {
       const request: FireworksChatRequest = {
         model: 'accounts/fireworks/models/qwen3-30b-a3b',
@@ -47,7 +47,7 @@ describe('MockFireworksSDK', () => {
       }
 
       const startTime = Date.now()
-      const result = await mockSdk.createChatCompletion(request)
+      const result = await mockSdk.createCompletion(request)
       const endTime = Date.now()
 
       expect(result).toMatchObject({
@@ -87,9 +87,9 @@ describe('MockFireworksSDK', () => {
         messages: [{ role: 'user', content: 'Tell me a joke' }]
       }
 
-      const helloResult = await mockSdk.createChatCompletion(helloRequest)
-      const weatherResult = await mockSdk.createChatCompletion(weatherRequest)
-      const jokeResult = await mockSdk.createChatCompletion(jokeRequest)
+      const helloResult = await mockSdk.createCompletion(helloRequest)
+      const weatherResult = await mockSdk.createCompletion(weatherRequest)
+      const jokeResult = await mockSdk.createCompletion(jokeRequest)
 
       expect(helloResult.choices[0].message.content).toContain('Hello')
       expect(weatherResult.choices[0].message.content).toContain('weather')
@@ -102,7 +102,7 @@ describe('MockFireworksSDK', () => {
         messages: [{ role: 'user', content: 'Hello world' }]
       }
 
-      const result = await mockSdk.createChatCompletion(request)
+      const result = await mockSdk.createCompletion(request)
 
       expect(result.usage.prompt_tokens).toBeGreaterThan(0)
       expect(result.usage.completion_tokens).toBeGreaterThan(0)
@@ -110,7 +110,7 @@ describe('MockFireworksSDK', () => {
     })
   })
 
-  describe('createChatCompletionStream', () => {
+  describe('createCompletionStream', () => {
     it('should return a readable stream with delay', async () => {
       const request: FireworksChatRequest = {
         model: 'accounts/fireworks/models/qwen3-30b-a3b',
@@ -118,7 +118,7 @@ describe('MockFireworksSDK', () => {
       }
 
       const startTime = Date.now()
-      const stream = await mockSdk.createChatCompletionStream(request)
+      const stream = await mockSdk.createCompletionStream(request)
       const endTime = Date.now()
 
       expect(stream).toBeInstanceOf(ReadableStream)
@@ -131,7 +131,7 @@ describe('MockFireworksSDK', () => {
         messages: [{ role: 'user', content: 'Hello' }]
       }
 
-      const stream = await mockSdk.createChatCompletionStream(request)
+      const stream = await mockSdk.createCompletionStream(request)
       const reader = stream.getReader()
       const chunks: string[] = []
 
@@ -167,7 +167,7 @@ describe('MockFireworksSDK', () => {
         ]
       }
 
-      const stream = await mockSdk.createChatCompletionStream(request)
+      const stream = await mockSdk.createCompletionStream(request)
       expect(stream).toBeInstanceOf(ReadableStream)
     })
   })
@@ -179,7 +179,7 @@ describe('MockFireworksSDK', () => {
         messages: []
       }
 
-      const result = await mockSdk.createChatCompletion(request)
+      const result = await mockSdk.createCompletion(request)
       expect(result.choices[0].message.content).toContain('mock response')
     })
 
@@ -189,7 +189,7 @@ describe('MockFireworksSDK', () => {
         messages: [{ role: 'user', content: '' }]
       }
 
-      const result = await mockSdk.createChatCompletion(request)
+      const result = await mockSdk.createCompletion(request)
       expect(result.choices[0].message.content).toContain('mock response')
     })
   })

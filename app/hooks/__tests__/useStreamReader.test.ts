@@ -1,9 +1,9 @@
-import { renderHook, act } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { useStreamReader, parseSSEChunk } from '../useStreamReader'
+import { act, renderHook } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { parseSSEChunk, useStreamReader } from '../useStreamReader'
 
 // Mock console methods to avoid noise in tests
-const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { })
 
 describe('useStreamReader', () => {
   beforeEach(() => {
@@ -169,7 +169,7 @@ describe('useStreamReader', () => {
       expect(onComplete).toHaveBeenCalledTimes(1)
       expect(onError).toHaveBeenCalledTimes(1)
       expect(onError).toHaveBeenCalledWith(expect.any(Error))
-      expect(consoleSpy).toHaveBeenCalledWith('Error parsing SSE data:', expect.any(SyntaxError))
+      expect(consoleSpy).toHaveBeenCalledWith('Error parsing SSE data:', '{invalid json}', expect.any(SyntaxError))
     })
 
     it('should handle stream without [DONE] marker', async () => {

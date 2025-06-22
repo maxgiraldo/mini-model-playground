@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { FireworksChatRequest, FireworksChatResponse, FireworksModel } from '../fireworks-ai'
 import { FireworksSDK } from '../fireworks-sdk'
-import { FireworksModel, FireworksChatRequest, FireworksChatResponse } from '../fireworks-ai'
 
 // Mock fetch globally
 global.fetch = vi.fn()
@@ -61,7 +61,7 @@ describe('FireworksSDK', () => {
         json: vi.fn().mockResolvedValue(mockModels)
       }
 
-      ;(global.fetch as any).mockResolvedValue(mockResponse)
+        ; (global.fetch as any).mockResolvedValue(mockResponse)
 
       const result = await sdk.getModels()
 
@@ -75,19 +75,19 @@ describe('FireworksSDK', () => {
         statusText: 'Not Found'
       }
 
-      ;(global.fetch as any).mockResolvedValue(mockResponse)
+        ; (global.fetch as any).mockResolvedValue(mockResponse)
 
       await expect(sdk.getModels()).rejects.toThrow('Failed to fetch models: Not Found')
     })
 
     it('should throw error when network error occurs', async () => {
-      ;(global.fetch as any).mockRejectedValue(new Error('Network error'))
+      ; (global.fetch as any).mockRejectedValue(new Error('Network error'))
 
       await expect(sdk.getModels()).rejects.toThrow('Network error')
     })
   })
 
-  describe('createChatCompletion', () => {
+  describe('createCompletion', () => {
     it('should create chat completion successfully', async () => {
       const mockRequest: FireworksChatRequest = {
         model: 'accounts/fireworks/models/qwen3-30b-a3b',
@@ -116,9 +116,9 @@ describe('FireworksSDK', () => {
         json: vi.fn().mockResolvedValue(mockResponse)
       }
 
-      ;(global.fetch as any).mockResolvedValue(mockFetchResponse)
+        ; (global.fetch as any).mockResolvedValue(mockFetchResponse)
 
-      const result = await sdk.createChatCompletion(mockRequest)
+      const result = await sdk.createCompletion(mockRequest)
 
       expect(global.fetch).toHaveBeenCalledWith(
         'https://api.fireworks.ai/inference/v1/chat/completions',
@@ -145,13 +145,13 @@ describe('FireworksSDK', () => {
         statusText: 'Bad Request'
       }
 
-      ;(global.fetch as any).mockResolvedValue(mockResponse)
+        ; (global.fetch as any).mockResolvedValue(mockResponse)
 
-      await expect(sdk.createChatCompletion(mockRequest)).rejects.toThrow('Chat completion failed: Bad Request')
+      await expect(sdk.createCompletion(mockRequest)).rejects.toThrow('Chat completion failed: Bad Request')
     })
   })
 
-  describe('createChatCompletionStream', () => {
+  describe('createCompletionStream', () => {
     it('should create streaming chat completion successfully', async () => {
       const mockRequest: FireworksChatRequest = {
         model: 'accounts/fireworks/models/qwen3-30b-a3b',
@@ -171,9 +171,9 @@ describe('FireworksSDK', () => {
         body: mockReadableStream
       }
 
-      ;(global.fetch as any).mockResolvedValue(mockResponse)
+        ; (global.fetch as any).mockResolvedValue(mockResponse)
 
-      const result = await sdk.createChatCompletionStream(mockRequest)
+      const result = await sdk.createCompletionStream(mockRequest)
 
       expect(global.fetch).toHaveBeenCalledWith(
         'https://api.fireworks.ai/inference/v1/chat/completions',
@@ -196,17 +196,21 @@ describe('FireworksSDK', () => {
       const mockRequest: FireworksChatRequest = {
         model: 'accounts/fireworks/models/qwen3-30b-a3b',
         messages: [{ role: 'user', content: 'Hello' }],
-        stream: true
+        stream: true,
       }
 
       const mockResponse = {
         ok: false,
-        statusText: 'Internal Server Error'
+        status: 500,
+        statusText: 'Internal Server Error',
+        json: vi.fn().mockRejectedValue(new Error('Failed to parse JSON')),
       }
 
-      ;(global.fetch as any).mockResolvedValue(mockResponse)
+        ; (global.fetch as any).mockResolvedValue(mockResponse)
 
-      await expect(sdk.createChatCompletionStream(mockRequest)).rejects.toThrow('Streaming chat completion failed: Internal Server Error')
+      await expect(sdk.createCompletionStream(mockRequest)).rejects.toThrow(
+        'Internal Server Error'
+      )
     })
 
     it('should throw error when response body is null', async () => {
@@ -221,9 +225,9 @@ describe('FireworksSDK', () => {
         body: null
       }
 
-      ;(global.fetch as any).mockResolvedValue(mockResponse)
+        ; (global.fetch as any).mockResolvedValue(mockResponse)
 
-      await expect(sdk.createChatCompletionStream(mockRequest)).rejects.toThrow('Response body is null')
+      await expect(sdk.createCompletionStream(mockRequest)).rejects.toThrow('Response body is null')
     })
   })
 }) 

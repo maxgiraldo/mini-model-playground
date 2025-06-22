@@ -1,11 +1,11 @@
-import { NextRequest } from 'next/server'
 import { ChatService } from '@/app/lib/chat/chat-service'
 import { ConsoleLogger, NoOpLogger } from '@/app/lib/logger'
+import { NextRequest } from 'next/server'
 
 export async function POST(request: NextRequest) {
   const logger = process.env.NODE_ENV === 'production' ? new NoOpLogger() : new ConsoleLogger()
   const chatService = new ChatService(logger)
-  
+
   try {
     const { model, messages } = await request.json()
 
@@ -27,10 +27,12 @@ export async function POST(request: NextRequest) {
       },
     })
   } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : 'An unknown error occurred'
     logger.error('Chat API error:', error)
-    return new Response(
-      JSON.stringify({ error: 'Failed to process chat request' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
-    )
+    return new Response(JSON.stringify({ error: errorMessage }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    })
   }
 }

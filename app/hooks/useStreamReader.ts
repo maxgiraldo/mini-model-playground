@@ -38,7 +38,7 @@ interface UseStreamReaderOptions {
  * })
  *
  * // Use with fetch response
- * const response = await fetch('/api/completions', { ... })
+ * const response = await fetch('/api/chat/completions', { ... })
  * const reader = response.body?.getReader()
  * if (reader) {
  *   await processStream(reader)
@@ -73,39 +73,67 @@ export function useStreamReader({ onChunk, onError, onComplete }: UseStreamReade
    */
   const processStream = useCallback(async (reader: ReadableStreamDefaultReader<Uint8Array>) => {
     const decoder = new TextDecoder()
+    let buffer = ''
 
     try {
       while (true) {
         const { done, value } = await reader.read()
-        if (done) break
+        if (done) {
+          if (buffer) {
+            const lines = buffer.split('\n')
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                const data = line.slice(6).trim()
+                if (data && data !== '[DONE]') {
+                  try {
+                    const parsed = JSON.parse(data)
+                    const content =
+                      parsed.choices?.[0]?.text ||
+                      parsed.choices?.[0]?.delta?.content ||
+                      ''
+                    if (content) {
+                      onChunk(content)
+                    }
+                  } catch (e) {
+                    console.error('Error parsing final SSE data:', data, e)
+                  }
+                }
+              }
+            }
+          }
+          break
+        }
 
-        const chunk = decoder.decode(value)
-        const lines = chunk.split('\n')
+        buffer += decoder.decode(value, { stream: true })
+        const lines = buffer.split('\n')
+        buffer = lines.pop() || ''
 
         for (const line of lines) {
           if (line.startsWith('data: ')) {
-            const data = line.slice(6)
+            const data = line.slice(6).trim()
             if (data === '[DONE]') {
               onComplete?.()
               return
             }
-            
+            if (!data) {
+              continue
+            }
+
             try {
               const parsed = JSON.parse(data)
-              // Support both completions API and chat completions API
               const content = parsed.choices?.[0]?.text || parsed.choices?.[0]?.delta?.content || ''
 
               if (content) {
                 onChunk(content)
               }
             } catch (e) {
-              console.error('Error parsing SSE data:', e)
+              console.error('Error parsing SSE data:', data, e)
               onError?.(e instanceof Error ? e : new Error('Failed to parse SSE data'))
             }
           }
         }
       }
-      
+
       onComplete?.()
     } catch (error) {
       console.error('Stream processing error:', error)

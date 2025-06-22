@@ -1,6 +1,6 @@
-import { IFireworksAI, FireworksChatRequest, FireworksChatResponse, FireworksModel } from "./fireworks-ai";
+import { FireworksAI, FireworksChatRequest, FireworksChatResponse, FireworksModel } from "./fireworks-ai";
 
-export class FireworksSDK implements IFireworksAI {
+export class FireworksSDK implements FireworksAI {
   private apiKey: string;
   private baseUrl: string = 'https://api.fireworks.ai/inference/v1';
 
@@ -10,15 +10,15 @@ export class FireworksSDK implements IFireworksAI {
 
   async getModels(): Promise<FireworksModel[]> {
     const response = await fetch('https://app.fireworks.ai/api/models/mini-playground');
-    
+
     if (!response.ok) {
       throw new Error(`Failed to fetch models: ${response.statusText}`);
     }
-    
+
     return response.json();
   }
 
-  async createChatCompletion(request: FireworksChatRequest): Promise<FireworksChatResponse> {
+  async createCompletion(request: FireworksChatRequest): Promise<FireworksChatResponse> {
     const response = await fetch(`${this.baseUrl}/chat/completions`, {
       method: 'POST',
       headers: {
@@ -35,7 +35,7 @@ export class FireworksSDK implements IFireworksAI {
     return response.json();
   }
 
-  async createChatCompletionStream(request: FireworksChatRequest): Promise<ReadableStream> {
+  async createCompletionStream(request: FireworksChatRequest): Promise<ReadableStream> {
     const response = await fetch(`${this.baseUrl}/chat/completions`, {
       method: 'POST',
       headers: {
@@ -49,7 +49,13 @@ export class FireworksSDK implements IFireworksAI {
     });
 
     if (!response.ok) {
-      throw new Error(`Streaming chat completion failed: ${response.statusText}`);
+      const errorBody = await response.json().catch(() => ({
+        error: { message: response.statusText },
+      }));
+      const errorMessage =
+        errorBody.error?.message ||
+        `Streaming chat completion failed: ${response.status} ${response.statusText}`;
+      throw new Error(errorMessage);
     }
 
     if (!response.body) {

@@ -1,6 +1,6 @@
-import { FireworksSDK } from '@/app/lib/fireworks/fireworks-sdk'
-import { MockFireworksSDK } from '@/app/lib/fireworks/mock-fireworks-sdk'
-import { Logger } from '@/app/lib/logger'
+import { FireworksSDK } from '@/app/lib/fireworks/fireworks-sdk';
+import { MockFireworksSDK } from '@/app/lib/fireworks/mock-fireworks-sdk';
+import { Logger } from '@/app/lib/logger';
 
 export class ModelsService {
   private logger: Logger;
@@ -14,26 +14,24 @@ export class ModelsService {
 
   async getModels() {
     this.logger.info('ModelsService.getModels called')
-    
-    // Check if we have a valid cached response
+
     if (this.modelsCache && this.cacheExpiry && Date.now() < this.cacheExpiry) {
       this.logger.info('Returning cached models, count:', this.modelsCache.length)
       return this.modelsCache
     }
-    
+
     const mock = process.env.MOCK_FIREWORKS === 'true'
     this.logger.info('Mock mode:', mock)
-    
+
     if (mock) {
       this.logger.info('Using MockFireworksSDK')
       const mockFireworks = new MockFireworksSDK()
       const models = await mockFireworks.getModels()
       this.logger.info('Mock models fetched successfully, count:', models.length)
-      
-      // Cache the mock models
+
       this.modelsCache = models
       this.cacheExpiry = Date.now() + this.CACHE_DURATION
-      
+
       return models
     }
 
@@ -42,20 +40,18 @@ export class ModelsService {
       this.logger.error('FIREWORKS_API_KEY is not configured')
       throw new Error('FIREWORKS_API_KEY is not configured')
     }
-    
+
     const fireworks = new FireworksSDK(apiKey)
     const models = await fireworks.getModels()
-    
+
     this.logger.info('Models fetched successfully, count:', models.length)
-    
-    // Cache the models
+
     this.modelsCache = models
     this.cacheExpiry = Date.now() + this.CACHE_DURATION
-    
+
     return models
   }
 
-  // Method to clear cache (useful for testing or manual cache invalidation)
   clearCache() {
     this.logger.info('Clearing models cache')
     this.modelsCache = null

@@ -18,7 +18,7 @@ export class ChatService {
     if (mock) {
       this.logger.info('Using MockFireworksSDK for chat')
       const mockFireworks = new MockFireworksSDK()
-      const stream = await mockFireworks.createChatCompletionStream({
+      const stream = await mockFireworks.createCompletionStream({
         model,
         messages,
         stream: true,
@@ -35,9 +35,8 @@ export class ChatService {
       throw new Error('FIREWORKS_API_KEY is not configured')
     }
     
-    this.logger.info('Using FireworksSDK for chat with API key:', apiKey.substring(0, 8) + '...')
     const fireworks = new FireworksSDK(apiKey)
-    const stream = await fireworks.createChatCompletionStream({
+    const stream = await fireworks.createCompletionStream({
       model,
       messages,
       stream: true,

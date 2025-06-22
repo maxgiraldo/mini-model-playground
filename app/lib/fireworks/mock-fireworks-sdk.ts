@@ -1,6 +1,6 @@
-import { IFireworksAI, FireworksChatRequest, FireworksChatResponse, FireworksModel } from "./fireworks-ai";
+import { FireworksAI, FireworksChatRequest, FireworksChatResponse, FireworksModel } from "./fireworks-ai";
 
-export class MockFireworksSDK implements IFireworksAI {
+export class MockFireworksSDK implements FireworksAI {
   private mockModels: FireworksModel[] = [
     {
       name: 'accounts/fireworks/models/qwen3-30b-a3b',
@@ -63,13 +63,11 @@ export class MockFireworksSDK implements IFireworksAI {
     return this.mockModels;
   }
 
-  async createChatCompletion(request: FireworksChatRequest): Promise<FireworksChatResponse> {
-    // Simulate network delay
+  async createCompletion(request: FireworksChatRequest): Promise<FireworksChatResponse> {
     await new Promise(resolve => setTimeout(resolve, 200));
-    
-    // Generate a mock response based on the request
+
     const mockContent = this.generateMockResponse(request.messages);
-    
+
     return {
       id: `mock-chat-${Date.now()}`,
       object: 'chat.completion',
@@ -91,18 +89,16 @@ export class MockFireworksSDK implements IFireworksAI {
     };
   }
 
-  async createChatCompletionStream(request: FireworksChatRequest): Promise<ReadableStream> {
-    // Simulate network delay
+  async createCompletionStream(request: FireworksChatRequest): Promise<ReadableStream> {
     await new Promise(resolve => setTimeout(resolve, 100));
-    
+
     const mockContent = this.generateMockResponse(request.messages);
     const words = mockContent.split(' ');
-    
+
     return new ReadableStream({
       start: (controller) => {
         const encoder = new TextEncoder();
-        
-        // Send initial data
+
         const initialData = {
           id: `mock-stream-${Date.now()}`,
           object: 'chat.completion.chunk',
@@ -114,10 +110,9 @@ export class MockFireworksSDK implements IFireworksAI {
             finish_reason: null
           }]
         };
-        
+
         controller.enqueue(encoder.encode(`data: ${JSON.stringify(initialData)}\n\n`));
-        
-        // Stream words with delays
+
         let wordIndex = 0;
         const streamWords = () => {
           if (wordIndex < words.length) {
@@ -133,14 +128,12 @@ export class MockFireworksSDK implements IFireworksAI {
                 finish_reason: null
               }]
             };
-            
+
             controller.enqueue(encoder.encode(`data: ${JSON.stringify(chunkData)}\n\n`));
             wordIndex++;
-            
-            // Schedule next word
+
             setTimeout(streamWords, 50);
           } else {
-            // Send final chunk
             const finalData = {
               id: `mock-stream-${Date.now()}`,
               object: 'chat.completion.chunk',
@@ -152,14 +145,13 @@ export class MockFireworksSDK implements IFireworksAI {
                 finish_reason: 'stop'
               }]
             };
-            
+
             controller.enqueue(encoder.encode(`data: ${JSON.stringify(finalData)}\n\n`));
             controller.enqueue(encoder.encode('data: [DONE]\n\n'));
             controller.close();
           }
         };
-        
-        // Start streaming
+
         setTimeout(streamWords, 100);
       }
     });
@@ -168,8 +160,7 @@ export class MockFireworksSDK implements IFireworksAI {
   private generateMockResponse(messages: any[]): string {
     const lastMessage = messages[messages.length - 1];
     const content = lastMessage?.content || '';
-    
-    // Generate different responses based on the input
+
     if (content.toLowerCase().includes('hello') || content.toLowerCase().includes('hi')) {
       return "Hello! I'm a mock AI assistant. How can I help you today?";
     } else if (content.toLowerCase().includes('weather')) {

@@ -40,6 +40,26 @@ export default function ChatInput({
     }
   }, [inputValue])
 
+  // Focus textarea after submission completes
+  useEffect(() => {
+    if (!isSubmitting && textareaRef.current) {
+      textareaRef.current.focus()
+    }
+  }, [isSubmitting])
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // Submit on Cmd+Enter (Mac) or Ctrl+Enter (Windows/Linux)
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      e.preventDefault()
+
+      // Only submit if we have content and a selected model
+      if (inputValue.trim() && selectedModel && !isSubmitting) {
+        const formEvent = new Event('submit', { bubbles: true, cancelable: true }) as any
+        onSubmit(formEvent)
+      }
+    }
+  }
+
   return (
     <form onSubmit={onSubmit} className="w-full" role="form">
       <div className="flex flex-col rounded-lg bg-white outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600">
@@ -55,6 +75,7 @@ export default function ChatInput({
           className="block w-full resize-none border-0 bg-transparent p-3 text-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-0 sm:text-sm/6"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={handleKeyDown}
           disabled={isSubmitting}
           autoFocus
         />

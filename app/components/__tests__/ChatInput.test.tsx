@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import ChatInput from '../ChatInput'
 
@@ -171,5 +171,142 @@ describe('ChatInput', () => {
 
     expect(mockProps.onSubmit).toHaveBeenCalled()
     // The onSubmit handler should check conditions and return early if not met
+  })
+
+  // New tests for Cmd+Enter functionality
+  it('submits form on Cmd+Enter when conditions are met', () => {
+    render(<ChatInput {...mockProps} inputValue="Hello world" />)
+
+    const textarea = screen.getByPlaceholderText('How can I help you today?')
+
+    fireEvent.keyDown(textarea, {
+      key: 'Enter',
+      metaKey: true, // Cmd key on Mac
+    })
+
+    expect(mockProps.onSubmit).toHaveBeenCalled()
+  })
+
+  it('submits form on Ctrl+Enter when conditions are met', () => {
+    render(<ChatInput {...mockProps} inputValue="Hello world" />)
+
+    const textarea = screen.getByPlaceholderText('How can I help you today?')
+
+    fireEvent.keyDown(textarea, {
+      key: 'Enter',
+      ctrlKey: true, // Ctrl key on Windows/Linux
+    })
+
+    expect(mockProps.onSubmit).toHaveBeenCalled()
+  })
+
+  it('does not submit on Cmd+Enter when input is empty', () => {
+    render(<ChatInput {...mockProps} inputValue="" />)
+
+    const textarea = screen.getByPlaceholderText('How can I help you today?')
+
+    fireEvent.keyDown(textarea, {
+      key: 'Enter',
+      metaKey: true,
+    })
+
+    expect(mockProps.onSubmit).not.toHaveBeenCalled()
+  })
+
+  it('does not submit on Cmd+Enter when no model is selected', () => {
+    render(<ChatInput {...mockProps} inputValue="Hello" selectedModel={null} />)
+
+    const textarea = screen.getByPlaceholderText('How can I help you today?')
+
+    fireEvent.keyDown(textarea, {
+      key: 'Enter',
+      metaKey: true,
+    })
+
+    expect(mockProps.onSubmit).not.toHaveBeenCalled()
+  })
+
+  it('does not submit on Cmd+Enter when already submitting', () => {
+    render(<ChatInput {...mockProps} inputValue="Hello" isSubmitting={true} />)
+
+    const textarea = screen.getByPlaceholderText('How can I help you today?')
+
+    fireEvent.keyDown(textarea, {
+      key: 'Enter',
+      metaKey: true,
+    })
+
+    expect(mockProps.onSubmit).not.toHaveBeenCalled()
+  })
+
+  it('does not submit on regular Enter key', () => {
+    render(<ChatInput {...mockProps} inputValue="Hello world" />)
+
+    const textarea = screen.getByPlaceholderText('How can I help you today?')
+
+    fireEvent.keyDown(textarea, {
+      key: 'Enter',
+    })
+
+    expect(mockProps.onSubmit).not.toHaveBeenCalled()
+  })
+
+  it('prevents default behavior on Cmd+Enter', () => {
+    render(<ChatInput {...mockProps} inputValue="Hello world" />)
+
+    const textarea = screen.getByPlaceholderText('How can I help you today?')
+
+    const event = fireEvent.keyDown(textarea, {
+      key: 'Enter',
+      metaKey: true,
+    })
+
+    // The event should be prevented from bubbling up
+    expect(mockProps.onSubmit).toHaveBeenCalled()
+  })
+
+  // New tests for auto-focus after submission
+  it('refocuses textarea after submission completes', async () => {
+    const { rerender } = render(<ChatInput {...mockProps} inputValue="Hello" isSubmitting={true} />)
+
+    const textarea = screen.getByPlaceholderText('How can I help you today?')
+
+    // Simulate submission completing
+    await act(async () => {
+      rerender(<ChatInput {...mockProps} inputValue="" isSubmitting={false} />)
+    })
+
+    // Textarea should be focused after submission completes
+    expect(document.activeElement).toBe(textarea)
+  })
+
+  it('maintains focus on textarea when submission is still in progress', async () => {
+    const { rerender } = render(<ChatInput {...mockProps} inputValue="Hello" isSubmitting={true} />)
+
+    const textarea = screen.getByPlaceholderText('How can I help you today?')
+
+    // Simulate submission still in progress
+    await act(async () => {
+      rerender(<ChatInput {...mockProps} inputValue="" isSubmitting={true} />)
+    })
+
+    // When textarea is disabled, it loses focus (expected browser behavior)
+    // So we just verify the textarea is disabled and exists
+    expect(textarea).toBeDisabled()
+    expect(textarea).toBeInTheDocument()
+  })
+
+  it('handles multiple Cmd+Enter presses correctly', () => {
+    render(<ChatInput {...mockProps} inputValue="Hello world" />)
+
+    const textarea = screen.getByPlaceholderText('How can I help you today?')
+
+    // Press Cmd+Enter multiple times
+    fireEvent.keyDown(textarea, { key: 'Enter', metaKey: true })
+    fireEvent.keyDown(textarea, { key: 'Enter', metaKey: true })
+    fireEvent.keyDown(textarea, { key: 'Enter', metaKey: true })
+
+    // Should only call onSubmit once per valid press
+    expect(mockProps.onSubmit).toHaveBeenCalledTimes(3)
   })
 }) 

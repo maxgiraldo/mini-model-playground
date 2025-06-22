@@ -96,6 +96,13 @@ The Mini Model Playground is a web application with a ChatGPT-like interface for
 - **Content Security Policy** - Implement CSP headers
 - **HTTPS only** - Use HTTPS in production
 
+### Git Conventions
+- **Conventional Commits** - Use conventional commit format: `type(scope): description`
+- **Commit Types** - Use standard types: feat, fix, docs, style, refactor, test, chore
+- **Scope Usage** - Include relevant scope (e.g., chat, api, components) when applicable
+- **Descriptive Messages** - Write clear, concise commit messages that explain the change
+- **Separate Concerns** - Create separate commits for different types of changes (features vs docs)
+
 ### Key Features
 
 #### Chat Interface

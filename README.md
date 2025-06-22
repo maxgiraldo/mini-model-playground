@@ -4,6 +4,10 @@ A simple, clean, and functional interface to interact with a curated list of ser
 
 Built with Next.js, TypeScript, and Tailwind CSS.
 
+## Live Site
+
+https://mini-model-playground-nine.vercel.app/
+
 ## Features
 
 - **Model Selection**: Dynamically fetches and displays a list of available models from the Fireworks AI API.

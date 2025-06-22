@@ -17,6 +17,8 @@ https://mini-model-playground-nine.vercel.app/
 - **Loading & Error States**: Provides clear loading indicators and handles API/network errors gracefully.
 - **Auto-Scrolling**: The chat view automatically scrolls to the latest message.
 - **Markdown Rendering**: Properly renders markdown in responses, including syntax highlighting for code blocks.
+- **Keyboard Shortcuts**: Send messages with Cmd+Enter (Mac) or Ctrl+Enter (Windows/Linux) for faster interaction.
+- **Auto-Focus**: Input field automatically refocuses after sending messages for seamless conversation flow.
 - **Responsive Design**: Optimized for desktop and mobile devices with smooth transitions.
 - **Accessibility**: Full keyboard navigation and screen reader support.
 
@@ -146,7 +148,7 @@ The application follows a standard Next.js App Router structure:
 **User Experience**:
 - **Conversation History**: Implement localStorage-based conversation persistence
 - **Export Functionality**: Allow users to export conversations as markdown or JSON
-- **Keyboard Shortcuts**: Add shortcuts for common actions (Ctrl+Enter to send, Ctrl+K for model selection)
+- **Additional Keyboard Shortcuts**: Add more shortcuts for common actions (Ctrl+K for model selection, Escape for cancel)
 - **Message Actions**: Add copy, edit, and delete functionality for individual messages
 - **Theme Support**: Implement dark/light mode toggle
 

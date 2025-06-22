@@ -120,7 +120,26 @@ The Mini Model Playground is a web application with a ChatGPT-like interface for
 
 ## Recent Changes
 
-### UI Redesign (Latest)
+### Keyboard Shortcuts and Auto-Focus (Latest)
+Enhanced the ChatInput component with better user interaction patterns:
+
+#### New Features
+- **Keyboard Shortcuts**: Added Cmd+Enter (Mac) and Ctrl+Enter (Windows/Linux) for form submission
+- **Auto-Focus**: Textarea automatically refocuses after message submission completes
+- **Smart Validation**: Keyboard shortcuts respect all existing validation rules (empty input, no model selected, submitting state)
+
+#### Technical Implementation
+- **Event Handling**: Added `handleKeyDown` function with cross-platform modifier key detection
+- **Focus Management**: UseEffect hook to manage focus state based on submission status
+- **Comprehensive Testing**: Added 10 new test cases covering keyboard interactions and focus behavior
+
+#### User Experience Improvements
+- **Faster Interaction**: Users can send messages without reaching for the mouse
+- **Continuous Flow**: Auto-focus enables seamless conversation flow
+- **Platform Awareness**: Works correctly on both Mac and Windows/Linux systems
+- **Accessibility**: Maintains all existing accessibility features while adding keyboard shortcuts
+
+### UI Redesign
 The chat interface has been redesigned to mimic a Google search page experience:
 
 #### Layout Changes
